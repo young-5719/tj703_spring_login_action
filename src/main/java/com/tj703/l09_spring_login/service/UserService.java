@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface UserService {
     Optional<User> login(String id, String pw);
+
+    boolean loginHash(User user);
 }

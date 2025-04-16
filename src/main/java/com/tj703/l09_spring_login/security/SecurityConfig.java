@@ -32,17 +32,14 @@ public class SecurityConfig {
                                 "/",
                                 "/public/**",
                                 "/user/jwt/login.do", // post loginAction
-                                "favicon.ico"
+                                "favicon.ico",
+                                "util.js"
                         ).permitAll()
                         .anyRequest().authenticated())
                 // jwt 로 쿠키로 로그인 할 때 설정
                 .sessionManagement(session->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(form->form
-                        .loginPage("/user/login.do") // login form
-                        .failureUrl("/user/login?error=true")
-                        .permitAll()
-                )
+
                 // 세션 기반의 인증을 사용하지 않겠다. -> jwt 기반 인증을 생성해서 추가해야함
                 .addFilterBefore(jwtLoginFilter, UsernamePasswordAuthenticationFilter.class) // -> JwtLoginFilter 클래스 만든 이후 추가
                 .build();
