@@ -33,7 +33,7 @@ public class JwtUtil {
                 .signWith(secretKey, SignatureAlgorithm.HS512) // 어떤 암호화 알고리즘을 어떤 비밀키로 서명할지 지정
                 .compact(); // 이 모든걸 압축해서 JWT 토큰 문자열로 만들어 반환
     }
-    public String getUsernameFromToken(String token) {
+    public String getUsername(String token) {
         String username = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
@@ -46,7 +46,7 @@ public class JwtUtil {
 
 
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token) throws JwtException {
         try{
             // 파서는?  "13" -> 13
             // 13 -> "13" 은 쉬움
@@ -55,22 +55,22 @@ public class JwtUtil {
                     .verifyWith(secretKey)
                     .build()
                     .parseClaimsJws(token); // Claims 본문에 있는 내용들을 키로 파싱하겠다.
-
+            return true; // 오류가 없다면
         }catch (io.jsonwebtoken.security.SecurityException e){ // 비밀번호가 잘못되었을 때
             e.printStackTrace();
-            return false;
+            throw new JwtException("Invalid JWT token");
         }
         catch (ExpiredJwtException e){ // 토큰이 만료되었을 때
             e.printStackTrace();
             //  logger.error(e.getMessage()); // 로그가 짧게 나와서 이건 회사갔을 때
-            return false;
+            throw new JwtException("Expired JWT token");
         }catch (UnsupportedJwtException e){ // 지원하지 않는 토큰
             e.printStackTrace();
-            return false;
+            throw new JwtException("Unsupported JWT token");
         }catch (Exception e){
             e.printStackTrace();
-            return false;
+            throw new JwtException("Invalid ex JWT token");
         }
-        return true; // 오류가 없다면
+
     }
 }

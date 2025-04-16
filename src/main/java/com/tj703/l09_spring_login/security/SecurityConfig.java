@@ -1,5 +1,7 @@
 package com.tj703.l09_spring_login.security;
 
+import com.tj703.l09_spring_login.jwt.JwtLoginFilter;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,12 +12,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig {
     // 기존의 SecurityFilter 이 세션 기반으로 인증을 진행중이었는데
     // jwt 로 진행하면 세션기반인증을 하지 않게 되고 로그인 액션 자동완성과 로그인 인증 필터가 jwt 기반으로 생성 후 참조
+    private final JwtLoginFilter jwtLoginFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -30,6 +35,7 @@ public class SecurityConfig {
                                 "favicon.ico"
                         ).permitAll()
                         .anyRequest().authenticated())
+                // jwt 로 쿠키로 로그인 할 때 설정
                 .sessionManagement(session->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(form->form
@@ -38,7 +44,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 // 세션 기반의 인증을 사용하지 않겠다. -> jwt 기반 인증을 생성해서 추가해야함
-                // .addFilterBefore()
+                .addFilterBefore(jwtLoginFilter, UsernamePasswordAuthenticationFilter.class) // -> JwtLoginFilter 클래스 만든 이후 추가
                 .build();
     }
 
