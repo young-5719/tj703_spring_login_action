@@ -6,11 +6,27 @@
     <th:block th:insert="fragment/headerNav :: head"></th:block>
 </head>
 <body>
-    <header th:insert="fragment/headerNav :: nav"></header>
-    <div class="container">
-        <h1 class="text-center mt-5">스프링 SPA jwt 로그인 수업</h1>
-        <div>
-            <h2 class="text-center mt-5">로그인 양식</h2>
+<header th:insert="fragment/headerNav :: nav"></header>
+<div class="container">
+    <h1 class="text-center mt-5">스프링 SPA jwt 로그인 수업</h1>
+    <div id="containerBody">
+
+    </div>
+</div>
+<script>
+    let loginForm= document.getElementById("loginForm");
+    const loginUserLink= document.getElementById("loginUserLink");
+    const loginLink= document.getElementById("loginLink");
+    const containerBody= document.getElementById("containerBody");
+
+    function loadLoginForm() {
+        containerBody.innerHTML=LoinForm();
+        loginForm=document.getElementById("loginForm");
+        loginForm.onsubmit=loginSubmitHandler;
+    }
+    function LoinForm(){
+        return `
+        <h2 class="text-center mt-5">로그인 양식</h2>
             <form id="loginForm" action="/user/jwt/login.do" method="post" style="width: 400px" class="mx-auto">
                 <div class="form-floating mb-3">
                     <input type="text" name="id" class="form-control" id="floatingInput" placeholder="USER ID">
@@ -21,36 +37,67 @@
                     <label for="floatingPassword">USER PW</label>
                 </div>
                 <div class="mt-3 text-end">
-                    <a class="btn btn-lg btn-outline-primary" href="/user/signup.do">회원가입</a>
                     <button class="btn btn-lg btn-success">로그인</button>
                 </div>
-            </form>
-
-        </div>
-    </div>
-<script>
-    const loginForm = document.getElementById("loginForm")
-    const LOGIN_URL = "/user/jwt/login.do";
-    loginForm.onsubmit = async (e)=>{
+            </form>`;
+    }
+    const loginSubmitHandler=async (e)=>{
+        const LOGIN_URL = "/user/jwt/login.do";
         e.preventDefault();
-        const formData = new FormData(loginForm); // 폼 데이터를 가져옴
-
-        // entries [id, 경민], [pw,1234] => {id:경민, pw:1234} => {\"id\":\"진영\"}
-        const formDataObj = Object.fromEntries(formData.entries());
-        const response = await fetch(LOGIN_URL,{
-            method :'POST',
-            headers : {"Content-Type" : "application/json"},
-            body: JSON.stringify(formDataObj),
+        const formData= new FormData(e.target);
+        //entries [id,경민],[pw,1234] => {id:경민,pw:1234} =>{\"id\":\"경민\",\"pw\":\"1234\"}
+        const formDataObj= Object.fromEntries(formData.entries());
+        const response=await fetch(LOGIN_URL,{
+            method:'POST',
+            headers:{"Content-Type":"application/json"},
+            body : JSON.stringify(formDataObj)
         });
-        // 성공 : 200 {"jwt" : "12231231asfda132"}
-        // 실패 : 403
+        //성공 : 200 {"jwt":"123123fdas123..."}
+        //실패 : 403
         if(response.ok){
-            const jwtObj = await response.json();
-            localStorage.setItem("jwt", jwtObj.jwt); // 저장
-            // localStorage.getItem("jwt"); // 가져올 때
+            const jwtObj= await response.json();
+            const user= jwtObj.user;
+            loginUserLink.innerText=`(${user.id})${user.name} 로그아웃`;
+            loginLink.classList.add('d-none');
+            localStorage.setItem("jwt", jwtObj["jwt"]);
             return;
         }
-        alert("아이디 비밀번호를 확인하세요")
+        alert("아이디 비밀번호를 확인하세요!");
+    }
+    async function loadAdminUsers(){
+        let url="/admin/user/list.do"
+        let jwt=localStorage.getItem("jwt");
+        if(jwt!=null){
+            const response = await fetch(url,{
+                headers:{"Authorization":'Bearer '+jwt},
+            })
+            console.log(response.status);
+            if(response.ok){
+                const users=await response.json();
+                console.log(users);
+                containerBody.innerHTML=AdminUsers(users);
+                return;
+            }
+            alert("로그인하세요!(권한없음)")
+            loadLoginForm();
+        }
+    }
+    function AdminUsers(users){
+        return `
+                <table>
+                    <thead>
+                        <tr><th>id</th><th>name</th><th>role</th></tr>
+                    </thead>
+                    <tbody>
+                         ${users.map(user=>`
+                        <tr><td>${user.id}</td><td>${user.name}</td><td>${user.role}</td></tr>`)}
+                    </tbody>
+                </table>`;
+    }
+    function logoutHandler(){
+        localStorage.removeItem("jwt");
+        alert("로그아웃 되었습니다.")
+        location.reload();
     }
 
 </script>

@@ -17,23 +17,20 @@ public class CustomUserDetails implements UserDetails {
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        return List.of(new SimpleGrantedAuthority("ROLE_"+user.getRole()));
     }
-    @JsonIgnore // 비밀번호는 출력시키고 싶지 않을 때
+    @JsonIgnore
     @Override
-    public String getPassword() {
-        return user.getPw();
-    }
+    public String getPassword() {return user.getPw();}
 
     @Override
     public String getUsername() {
         return user.getId();
     }
-    // 밑에는 선택사항
     public String getRole() {
         return user.getRole();
     }
-    public String getName(){
+    public String getName() {
         return user.getName();
     }
 }

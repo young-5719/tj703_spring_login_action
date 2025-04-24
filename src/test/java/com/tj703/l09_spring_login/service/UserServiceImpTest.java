@@ -17,4 +17,9 @@ class UserServiceImpTest {
         Optional<User> userOpt = userService.login("user1", "1234");
         userOpt.ifPresent(System.out::println);
     }
+
+    @Test
+    void list() {
+        System.out.println(userService.list());
+    }
 }
