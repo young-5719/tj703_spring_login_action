@@ -6,6 +6,6 @@ spring:
   application:
     name: l09_spring_login
   profiles:
-    include: dev
-#    include: deploy
+    include: deploy
+#    include: dev
 

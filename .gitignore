@@ -1,10 +1,15 @@
-src/main/resources/application-deploy.yaml
+#src/main/resources/application-deploy.yaml
+
+#git rm --cached -f src/main/resources/env.properties
+# 깃에 올라가면 안되지만 캐시에 남아있을 가능성이 있기 때문에 캐시 삭제까지 터미널에서 해주어야 함
+src/main/resources/env.properties
 HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+
 
 ### STS ###
 .apt_generated

@@ -1,4 +1,5 @@
 DROP DATABASE IF EXISTS login_study;
+DROP USER IF EXISTS 'login_study_dev'@'localhost';
 DROP USER IF EXISTS 'login_study_dev'@'%';
 CREATE DATABASE login_study CHAR SET utf8;
 CREATE USER 'login_study_dev'@'%' IDENTIFIED BY '12345678';
